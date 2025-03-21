@@ -1,0 +1,462 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ✅ Ensures full-screen coverage */
+  width: 100vw;
+  background: linear-gradient(to bottom right, #cfe0fc, #ebf8ff, #ffffff);
+  background-size: cover; /* ✅ Prevents visible lines */
+  background-attachment: fixed; /* ✅ Fixes color difference */
+  font-family: sans-serif;
+}
+
+.explore-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.explore-logo {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(to right, #3a7bd5, #3a6073);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  cursor: pointer;
+}
+
+.explore-header-right {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-right: 50px;
+}
+
+/* "Logout" button in the header */
+.explore-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(to right, #3a7bd5, #3a6073);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  outline: none;
+}
+
+.explore-logout-btn:hover {
+  box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+  transform: translateY(-2px);
+}
+
+.explore-aside {
+  width: 250px;
+  height: 34vh;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  position: fixed;
+  left: 1rem;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  margin-top: 60px;
+  z-index: 2;
+}
+
+/* Nav Container in the Aside */
+.explore-aside-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-grow: 1; /* Navigation items push the profile to bottom */
+}
+
+/* Buttons within .explore-aside-nav */
+.explore-aside-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.explore-aside-button:hover {
+  background: #b9cfff;
+}
+
+/* Divider within the aside */
+.explore-aside-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin-top: 10px;
+}
+
+/* Sidebar Profile Button */
+.explore-aside-profile {
+  border-top: 1px solid #e0e0e0;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  padding: 10px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 400px;
+  transition: background 0.2s ease;
+  outline: none;
+}
+
+.explore-aside-profile:hover {
+  background: #b9cfff;
+}
+
+.explore-aside-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.explore-profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.explore-profile-username {
+  font-size: 12px;
+  color: #777;
+  margin: 0;
+}
+
+.explore-main-content {
+  flex: 1; /* allows this area to expand */
+  padding-left: 17rem; /* same left padding as your sidebar */
+  width: auto;
+  min-height: 200vh; /* ensures a tall area */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 850px; /* enough space under the header */
+  position: relative;
+  margin-top: -250px;
+}
+
+/* Outer container (white box) */
+.explore-search-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 1000px;
+  margin-top: 150px;
+  margin-bottom: 20px;
+}
+
+/* Title/H2 styling */
+.explore-search-heading {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px; /* Adjust spacing below the heading if needed */
+}
+
+/* Search Bar Container */
+.explore-search-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 10px;
+  background: #fff;
+  position: relative; /* For autocomplete results absolute positioning */
+  z-index: 100; /* Keep above other elements */
+}
+
+/* The input element inside the search bar */
+.explore-search-input {
+  flex: 1;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+}
+
+/* Autocomplete Suggestions Container */
+.explore-suggestions {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  list-style: none;
+  max-height: 100px;
+  overflow-y: auto;
+  z-index: 101;
+}
+
+/* Single suggestion <li> */
+.explore-suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Hover style for suggestion items */
+.explore-suggestion-item:hover {
+  background: #f0f0f0;
+}
+
+.explore-posts-grid {
+  padding: 20px;
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(3, 0.7fr);
+  gap: 20px;
+  font-size: 14px;
+  margin-top: 10px;
+  align-content: start;
+  align-items: start;
+  min-height: 600px;
+  transition: all 0.3s ease;
+}
+
+/* Post Container */
+.explore-post {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  text-align: left;
+  padding: 20px;
+  background: white;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  height: auto; /* allows dynamic height */
+}
+
+/* Post Image */
+.explore-post-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* Category Tag */
+.explore-post-category {
+  font-size: 12px;
+  font-weight: bold;
+  color: gray;
+  background-color: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+/* Post Title */
+.explore-post-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.next-page-button {
+  background-color: transparent;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.next-page-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Container to ensure consistent layout */
+.explore-container {
+  max-width: 1200px;
+  width: 90%;
+  padding-top: 80px;
+}
+
+/* Card styles for posts */
+.explore-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.explore-card:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.search-container {
+  width: 100%;
+  min-height: 50px;
+  position: relative;
+  z-index: 10;
+  margin-top: 20px;
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 5px);
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* 
+  =======================
+     RESPONSIVE STYLES
+  =======================
+*/
+
+/* For medium screens (tablets, small laptops) */
+@media (max-width: 992px) {
+  /* Reduce aside width, main content padding */
+  .explore-aside {
+    width: 200px;
+  }
+  .explore-main-content {
+    padding-left: 14rem;
+  }
+  /* Adjust the search wrapper width */
+  .explore-search-wrapper {
+    width: 80%;
+    max-width: 800px;
+  }
+  /* Posts grid with 2 columns on medium screens */
+  .explore-posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* For tablets and smaller devices (portrait tablets, large phones) */
+@media (max-width: 768px) {
+  /* Hide or reposition aside for smaller screens */
+  .explore-aside {
+    position: static;
+    width: auto;
+    margin-top: 0;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    gap: 1rem;
+  }
+
+  /* Reduce main content top/left padding so it’s more compact */
+  .explore-main-content {
+    padding-left: 1rem;
+    padding-top: 200px; /* Enough space for the header + aside if needed */
+  }
+
+  /* Make the search wrapper fill more of the screen width */
+  .explore-search-wrapper {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 100px;
+  }
+
+  /* Posts grid with 1 column */
+  .explore-posts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* For mobile screens (small phones) */
+@media (max-width: 480px) {
+  .explore-logo {
+    font-size: 18px;
+  }
+  .explore-logout-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  /* Tweak aside nav button font-size */
+  .explore-aside-button {
+    font-size: 14px;
+  }
+
+  /* Further reduce search wrapper width */
+  .explore-search-wrapper {
+    width: 90%;
+    margin-top: 80px;
+  }
+
+  /* Adjust heading & post titles for smaller screens */
+  .explore-search-heading {
+    font-size: 20px;
+  }
+  .explore-post-title {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .explore-main-content {
+    padding-left: 14rem;
+    padding-top: 850px;
+    margin-top: 40px;
+  }
+}

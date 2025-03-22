@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Home, Compass, Search, LogOut, MessageSquare, Heart } from "lucide-react";
+import {
+  Home,
+  Compass,
+  Search,
+  LogOut,
+  MessageSquare,
+  Heart,
+} from "lucide-react";
 import IconButton from "@mui/material/IconButton";
 import avatar from "./assets/avatar.png";
 import Loading from "./Components/loading";
 import "./Explore.css";
 import Loader from "./Components/Loader";
 import { Send, Trash2 } from "lucide-react";
+import API from "./api/axios";
 
 const Explore: React.FC = () => {
   const navigate = useNavigate();
@@ -24,18 +32,20 @@ const Explore: React.FC = () => {
     _id: string;
     title: string;
     content: string;
-    sender: {
-      name: string;
-      email: string;
-      profilePic?: string;
-    } | string;
+    sender:
+      | {
+          name: string;
+          email: string;
+          profilePic?: string;
+        }
+      | string;
     image?: string;
     category?: string;
     likes?: string[];
     comments?: Comment[];
     createdAt: string;
   }
-  
+
   // ✅ Added useState for selected category
   const [categories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
@@ -70,9 +80,7 @@ const Explore: React.FC = () => {
   // Function to fetch comments for a post
   const fetchComments = async (postId: string) => {
     try {
-      const response = await axios.get(
-        `http://localhost:6060/comments/post/${postId}`
-      );
+      const response = await API.get(`/comments/post/${postId}`);
       console.log("Fetched Comments:", response.data);
       return response.data;
     } catch (error) {
@@ -83,7 +91,7 @@ const Explore: React.FC = () => {
 
   // ✅ Ensure this useEffect fetches posts correctly
   useEffect(() => {
-    let url = `http://localhost:6060/posts?page=${page}&limit=10`;
+    let url = `/posts?page=${page}&limit=10`;
     if (selectedCategory) {
       url += `&category=${selectedCategory}`;
     }
@@ -97,33 +105,36 @@ const Explore: React.FC = () => {
           const formattedPosts = await Promise.all(
             (response.data.posts || []).map(async (post: Post) => {
               const comments = await fetchComments(post._id);
-              
+
               // Ensure sender is properly formatted
               let senderData = post.sender;
-              if (typeof post.sender === 'string') {
+              if (typeof post.sender === "string") {
                 try {
-                  const userResponse = await axios.get(
-                    `http://localhost:6060/auth/user-by-email/${post.sender}`
+                  const userResponse = await API.get(
+                    `/auth/user-by-email/${post.sender}`
                   );
                   senderData = userResponse.data || {
                     name: "Unknown User",
                     email: post.sender,
-                    profilePic: avatar
+                    profilePic: avatar,
                   };
                 } catch (error) {
-                  console.error(`Error fetching user for email: ${post.sender}`, error);
+                  console.error(
+                    `Error fetching user for email: ${post.sender}`,
+                    error
+                  );
                   senderData = {
                     name: "Unknown User",
                     email: post.sender,
-                    profilePic: avatar
+                    profilePic: avatar,
                   };
                 }
               }
-              
+
               return {
                 ...post,
                 sender: senderData,
-                comments: comments || []
+                comments: comments || [],
               };
             })
           );
@@ -156,10 +167,9 @@ const Explore: React.FC = () => {
 
     if (!userId || !token) return;
 
-    axios
-      .get(`http://localhost:6060/auth/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    API.get(`/auth/users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((response) => {
         setUserInfo({
           name: response.data.name,
@@ -204,8 +214,8 @@ const Explore: React.FC = () => {
 
     try {
       // Submit new comment
-      const response = await axios.post(
-        "http://localhost:6060/comments/",
+      const response = await API.post(
+        "/comments/",
         {
           postId: postId,
           content: commentInput[postId],
@@ -250,7 +260,7 @@ const Explore: React.FC = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:6060/comments/${commentId}`, {
+      await API.delete(`/comments/${commentId}`, {
         headers: { Authorization: `JWT ${token}` },
       });
 
@@ -284,7 +294,7 @@ const Explore: React.FC = () => {
       alert("Failed to delete comment. Please try again.");
     }
   };
-  
+
   // Function to handle liking a post
   const handleLike = async (postId: string) => {
     const token = localStorage.getItem("token");
@@ -297,8 +307,8 @@ const Explore: React.FC = () => {
 
     try {
       // Send the like request to the server
-      const response = await axios.put(
-        `http://localhost:6060/posts/${postId}/like`,
+      const response = await API.put(
+        `/posts/${postId}/like`,
         { userId }, // Send user ID
         { headers: { Authorization: `JWT ${token}` } }
       );
@@ -316,11 +326,13 @@ const Explore: React.FC = () => {
       if (selectedPost && selectedPost._id === postId) {
         setSelectedPost({
           ...selectedPost,
-          likes: response.data.likedBy
+          likes: response.data.likedBy,
         });
       }
-      
-      console.log(`✅ Post liked. New likes count: ${response.data.likedBy.length}`);
+
+      console.log(
+        `✅ Post liked. New likes count: ${response.data.likedBy.length}`
+      );
     } catch (error) {
       console.error("❌ Error liking post:", error);
     }
@@ -432,14 +444,14 @@ const Explore: React.FC = () => {
         {/* Posts Grid Below Title */}
         <div className="explore-posts-grid">
           {filteredPosts.map((post) => (
-            <div 
-              key={post._id} 
+            <div
+              key={post._id}
               className="explore-post"
               onClick={() => {
                 setSelectedPost(post);
                 setCommentModalOpen(true);
               }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
             >
               {post.image && (
                 <img
@@ -452,13 +464,21 @@ const Explore: React.FC = () => {
                 {post.category || "Uncategorized"}
               </p>
               <h3 className="explore-post-title">{post.title}</h3>
-              <p>{post.content.length > 100 
-                  ? `${post.content.substring(0, 100)}...` 
+              <p>
+                {post.content.length > 100
+                  ? `${post.content.substring(0, 100)}...`
                   : post.content}
               </p>
-              
+
               {/* Post Footer */}
-              <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px', gap: '10px' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: "10px",
+                  gap: "10px",
+                }}
+              >
                 {/* Like Button */}
                 <IconButton
                   aria-label="like"
@@ -467,20 +487,33 @@ const Explore: React.FC = () => {
                     e.stopPropagation();
                     handleLike(post._id);
                   }}
-                  style={{ padding: '4px' }}
+                  style={{ padding: "4px" }}
                 >
-                  {post.likes && post.likes.includes(localStorage.getItem("user")?.replace(/"/g, "") ?? "") ? (
+                  {post.likes &&
+                  post.likes.includes(
+                    localStorage.getItem("user")?.replace(/"/g, "") ?? ""
+                  ) ? (
                     <Heart size={18} color="red" strokeWidth={1.5} fill="red" />
                   ) : (
                     <Heart size={18} color="#070708" strokeWidth={1.5} />
                   )}
                   {post.likes && post.likes.length > 0 && (
-                    <span style={{ marginLeft: '5px', fontSize: '14px' }}>{post.likes.length}</span>
+                    <span style={{ marginLeft: "5px", fontSize: "14px" }}>
+                      {post.likes.length}
+                    </span>
                   )}
                 </IconButton>
 
                 {/* Comment Button */}
-                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '14px', color: '#555' }}>
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    fontSize: "14px",
+                    color: "#555",
+                  }}
+                >
                   <MessageSquare size={18} color="#555" strokeWidth={1.5} />
                   {post.comments?.length || 0} Comments
                 </span>
@@ -499,7 +532,7 @@ const Explore: React.FC = () => {
                 />
               ))}
         </div>
-        
+
         {loading1 ? (
           // 1) Show Spinner if currently loading
           <Loader />
@@ -531,7 +564,13 @@ const Explore: React.FC = () => {
                   <img src={selectedPost.image} alt="Post" />
                 ) : (
                   <div className="comments-modal-noimage">
-                    <p style={{ fontSize: "18px", marginBottom: "10px", color: "#333" }}>
+                    <p
+                      style={{
+                        fontSize: "18px",
+                        marginBottom: "10px",
+                        color: "#333",
+                      }}
+                    >
                       {selectedPost.title}
                     </p>
                     <p style={{ color: "#333" }}>{selectedPost.content}</p>
@@ -553,26 +592,25 @@ const Explore: React.FC = () => {
                 <div className="comments-post-info">
                   <img
                     src={
-                      typeof selectedPost.sender === "object" 
-                        ? selectedPost.sender.profilePic || avatar 
+                      typeof selectedPost.sender === "object"
+                        ? selectedPost.sender.profilePic || avatar
                         : avatar
                     }
                     alt="Profile"
                   />
                   <div className="post-info-text">
                     <div className="post-sender">
-                      {typeof selectedPost.sender === "object" ? selectedPost.sender.name : "Unknown User"}{" "}
+                      {typeof selectedPost.sender === "object"
+                        ? selectedPost.sender.name
+                        : "Unknown User"}{" "}
                       <span className="post-sender-username">
-                        @{
-                          typeof selectedPost.sender === "object" 
-                            ? selectedPost.sender.email.split("@")[0]
-                            : "unknown"
-                        }
+                        @
+                        {typeof selectedPost.sender === "object"
+                          ? selectedPost.sender.email.split("@")[0]
+                          : "unknown"}
                       </span>
                     </div>
-                    <p className="comments-post-title">
-                      {selectedPost.title}
-                    </p>
+                    <p className="comments-post-title">{selectedPost.title}</p>
                   </div>
                 </div>
 
@@ -593,14 +631,15 @@ const Explore: React.FC = () => {
                               </span>
                               <span className="comment-date">
                                 {comment.createdAt
-                                  ? new Date(
-                                      comment.createdAt
-                                    ).toLocaleString(undefined, {
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
+                                  ? new Date(comment.createdAt).toLocaleString(
+                                      undefined,
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      }
+                                    )
                                   : "Just now"}
                               </span>
                             </div>
@@ -638,8 +677,7 @@ const Explore: React.FC = () => {
                         className="icon"
                       />
                       <p>
-                        No comments yet. Be the first to share your
-                        thoughts!
+                        No comments yet. Be the first to share your thoughts!
                       </p>
                     </div>
                   )}

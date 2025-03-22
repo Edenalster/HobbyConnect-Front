@@ -15,6 +15,7 @@ import {
 import avatar from "./assets/avatar.png";
 import Loading from "./Components/loading";
 import Loader from "./Components/Loader";
+import API from "./api/axios";
 
 // Define a TypeScript type for Post
 interface Post {
@@ -91,10 +92,9 @@ const HomeLoggedIn: React.FC = () => {
     console.log("🔐 Token:", token);
 
     // Fetch user info
-    axios
-      .get(`http://localhost:6060/auth/users/${userId}`, {
-        headers: { Authorization: `JWT ${token}` },
-      })
+    API.get(`/auth/users/${userId}`, {
+      headers: { Authorization: `JWT ${token}` },
+    })
       .then((response) => {
         setUserInfo({
           name: response.data.name,
@@ -110,8 +110,7 @@ const HomeLoggedIn: React.FC = () => {
       .catch((error) => console.error("Error fetching user info:", error));
 
     // Fetch posts from backend
-    axios
-      .get("http://localhost:6060/posts")
+    API.get("/posts")
       .then(async (response) => {
         const formattedPosts = await Promise.all(
           response.data.map(async (post: Post) => {
@@ -125,8 +124,8 @@ const HomeLoggedIn: React.FC = () => {
 
             if (post.sender && typeof post.sender === "string") {
               try {
-                const userResponse = await axios.get(
-                  `http://localhost:6060/auth/user-by-email/${post.sender}`
+                const userResponse = await API.get(
+                  `/auth/user-by-email/${post.sender}`
                 );
                 userDetails = userResponse.data;
               } catch (error) {
@@ -153,8 +152,7 @@ const HomeLoggedIn: React.FC = () => {
   // Fetch posts from backend (with paging)
   useEffect(() => {
     // setLoading1(true);
-    axios
-      .get(`http://localhost:6060/posts?page=${page}&limit=5`)
+    API.get(`/posts?page=${page}&limit=5`)
       .then(async (response) => {
         // Now do your user detail + comment logic:
         const formattedPosts = await Promise.all(
@@ -170,8 +168,8 @@ const HomeLoggedIn: React.FC = () => {
             };
             if (typeof post.sender === "string") {
               try {
-                const userResponse = await axios.get(
-                  `http://localhost:6060/auth/user-by-email/${post.sender}`
+                const userResponse = await API.get(
+                  `/auth/user-by-email/${post.sender}`
                 );
                 userDetails = userResponse.data;
               } catch (error) {
@@ -241,16 +239,12 @@ const HomeLoggedIn: React.FC = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:6060/posts",
-        newPost,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${token}`,
-          },
-        }
-      );
+      const response = await API.post("/posts", newPost, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${token}`,
+        },
+      });
 
       console.log("✅ New post saved:", response.data);
 
@@ -296,10 +290,9 @@ const HomeLoggedIn: React.FC = () => {
       formData.append("file", file); // Ensure correct file key
 
       try {
-        const uploadResponse = await axios.post(
-          "http://localhost:6060/files/upload",
-          formData
-        );
+        const uploadResponse = await API.post("/files/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
         const imageUrl = uploadResponse.data.url; // ✅ Correct URL from server
 
@@ -329,8 +322,8 @@ const HomeLoggedIn: React.FC = () => {
     try {
       console.log("📤 Sending AI suggestion request...");
 
-      const response = await axios.post(
-        "http://localhost:6060/api/posts/suggestions",
+      const response = await API.post(
+        "/api/posts/suggestions",
         { userInput: newPostContent },
         {
           headers: { "Content-Type": "application/json" },
@@ -389,8 +382,8 @@ const HomeLoggedIn: React.FC = () => {
     }
 
     try {
-      const response = await axios.put(
-        `http://localhost:6060/posts/${postId}/like`,
+      const response = await API.put(
+        `/posts/${postId}/like`,
         { userId }, // ✅ Send user ID
         { headers: { Authorization: `JWT ${token}` } }
       );
@@ -422,8 +415,8 @@ const HomeLoggedIn: React.FC = () => {
 
     try {
       // ✅ Step 1: Submit new comment
-      const response = await axios.post(
-        "http://localhost:6060/comments/",
+      const response = await API.post(
+        "/comments/",
         {
           postId: postId,
           content: commentInput[postId],
@@ -459,9 +452,7 @@ const HomeLoggedIn: React.FC = () => {
 
   const fetchComments = async (postId: string) => {
     try {
-      const response = await axios.get(
-        `http://localhost:6060/comments/post/${postId}`
-      );
+      const response = await API.get(`/comments/post/${postId}`);
       console.log("Fetched Comments:", response.data); // ✅ Debugging log
       return response.data;
     } catch (error) {
@@ -478,7 +469,7 @@ const HomeLoggedIn: React.FC = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:6060/comments/${commentId}`, {
+      await API.delete(`/comments/${commentId}`, {
         headers: { Authorization: `JWT ${token}` },
       });
 

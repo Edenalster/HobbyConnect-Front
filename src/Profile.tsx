@@ -3,7 +3,7 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import EditProfileModal from "./Components/EditProfileModal";
 import avatar from "./assets/avatar.png"; // Default avatar
-import axios from "axios";
+
 import {
   Trash2,
   RefreshCcw,
@@ -17,16 +17,19 @@ import {
   Send,
 } from "lucide-react";
 import Loading from "./Components/loading";
+import API from "./api/axios";
 
 interface Post {
   _id: string;
   title: string;
   content: string;
-  sender: string | {
-    name: string;
-    email: string;
-    profilePic?: string;
-  };
+  sender:
+    | string
+    | {
+        name: string;
+        email: string;
+        profilePic?: string;
+      };
   image?: string;
   category: string;
   likes?: string[];
@@ -77,9 +80,7 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         // ✅ Fetch User Profile
-        const profileResponse = await axios.get(
-          `http://localhost:6060/auth/users/${userId}`
-        );
+        const profileResponse = await API.get(`/auth/users/${userId}`);
         const profileData = profileResponse.data;
 
         setProfile({
@@ -113,43 +114,45 @@ const Profile: React.FC = () => {
       if (!token || !profile.email) return;
 
       try {
-        const postsResponse = await axios.get(
-          `http://localhost:6060/posts/user/${profile.email}`,
-          { headers: { Authorization: `JWT ${token}` } }
-        );
+        const postsResponse = await API.get(`/posts/user/${profile.email}`, {
+          headers: { Authorization: `JWT ${token}` },
+        });
 
         if (Array.isArray(postsResponse.data)) {
           // ✅ Fetch comments for each post and format them correctly
           const formattedPosts = await Promise.all(
             postsResponse.data.map(async (post: Post) => {
               const comments = await fetchComments(post._id);
-              
+
               // Format post.sender as an object if it's a string
               let senderData = post.sender;
-              if (typeof post.sender === 'string') {
+              if (typeof post.sender === "string") {
                 try {
-                  const userResponse = await axios.get(
-                    `http://localhost:6060/auth/user-by-email/${post.sender}`
+                  const userResponse = await API.get(
+                    `/auth/user-by-email/${post.sender}`
                   );
                   senderData = userResponse.data || {
                     name: "Unknown User",
                     email: post.sender,
-                    profilePic: avatar
+                    profilePic: avatar,
                   };
                 } catch (error) {
-                  console.error(`Error fetching user for email: ${post.sender}`, error);
+                  console.error(
+                    `Error fetching user for email: ${post.sender}`,
+                    error
+                  );
                   senderData = {
                     name: "Unknown User",
                     email: post.sender,
-                    profilePic: avatar
+                    profilePic: avatar,
                   };
                 }
               }
-              
-              return { 
-                ...post, 
+
+              return {
+                ...post,
                 sender: senderData,
-                comments: comments || [] 
+                comments: comments || [],
               };
             })
           );
@@ -172,8 +175,8 @@ const Profile: React.FC = () => {
     if (!token || !email) return;
 
     try {
-      const postsResponse = await axios.get(
-        `http://localhost:6060/posts/user/${email}`, // ✅ Fetch only the user's posts
+      const postsResponse = await API.get(
+        `/posts/user/${email}`, // ✅ Fetch only the user's posts
         {
           headers: { Authorization: `JWT ${token}` },
         }
@@ -183,33 +186,36 @@ const Profile: React.FC = () => {
         const formattedPosts = await Promise.all(
           postsResponse.data.map(async (post: Post) => {
             const comments = await fetchComments(post._id); // ✅ Fetch comments for each post
-            
+
             // Format post.sender as an object if it's a string
             let senderData = post.sender;
-            if (typeof post.sender === 'string') {
+            if (typeof post.sender === "string") {
               try {
-                const userResponse = await axios.get(
-                  `http://localhost:6060/auth/user-by-email/${post.sender}`
+                const userResponse = await API.get(
+                  `/auth/user-by-email/${post.sender}`
                 );
                 senderData = userResponse.data || {
                   name: "Unknown User",
                   email: post.sender,
-                  profilePic: avatar
+                  profilePic: avatar,
                 };
               } catch (error) {
-                console.error(`Error fetching user for email: ${post.sender}`, error);
+                console.error(
+                  `Error fetching user for email: ${post.sender}`,
+                  error
+                );
                 senderData = {
                   name: "Unknown User",
                   email: post.sender,
-                  profilePic: avatar
+                  profilePic: avatar,
                 };
               }
             }
-            
-            return { 
-              ...post, 
+
+            return {
+              ...post,
               sender: senderData,
-              comments: comments || [] 
+              comments: comments || [],
             };
           })
         );
@@ -221,12 +227,10 @@ const Profile: React.FC = () => {
       console.error("❌ Error fetching user posts:", error);
     }
   };
-  
+
   const fetchComments = async (postId: string) => {
     try {
-      const response = await axios.get(
-        `http://localhost:6060/comments/post/${postId}`
-      );
+      const response = await API.get(`/comments/post/${postId}`);
       console.log("Fetched Comments:", response.data); // ✅ Debugging log
       return response.data;
     } catch (error) {
@@ -258,13 +262,9 @@ const Profile: React.FC = () => {
         const formData = new FormData();
         formData.append("file", updatedProfile.profilePic);
 
-        const uploadResponse = await axios.post(
-          "http://localhost:6060/files/upload",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+        const uploadResponse = await API.post("/files/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
         if (!uploadResponse.data.url) {
           throw new Error("🛑 Profile image upload failed");
@@ -285,13 +285,9 @@ const Profile: React.FC = () => {
       console.log("📤 Sending updated profile data to backend:", updatedData);
 
       // 🔥 Send update request to backend
-      const response = await axios.put(
-        `http://localhost:6060/auth/users/${userId}`,
-        updatedData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await API.put(`/auth/users/${userId}`, updatedData, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       console.log("✅ Profile updated successfully:", response.data);
       setProfile(updatedData); // Update UI with new profile data
@@ -316,29 +312,25 @@ const Profile: React.FC = () => {
         title: updatedPost.title,
         content: updatedPost.content,
         image: updatedPost.image,
-        category: updatedPost.category || "Uncategorized"
+        category: updatedPost.category || "Uncategorized",
       };
 
       console.log("Updating post with data:", postData);
 
       // Send the update request
-      const response = await axios.put(
-        `http://localhost:6060/posts/${updatedPost._id}`,
-        postData,
-        {
-          headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `JWT ${token}` 
-          },
-        }
-      );
+      const response = await API.put(`/posts/${updatedPost._id}`, postData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${token}`,
+        },
+      });
 
       console.log("Post update response:", response.data);
 
       // Update the posts in state to show the changes
       setUserPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === updatedPost._id ? {...post, ...postData} : post
+          post._id === updatedPost._id ? { ...post, ...postData } : post
         )
       );
 
@@ -354,27 +346,23 @@ const Profile: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       console.log("📤 Uploading image to server...");
-  
+
       const formData = new FormData();
       formData.append("file", file);
-  
+
       try {
-        const uploadResponse = await axios.post(
-          "http://localhost:6060/files/upload",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-  
+        const uploadResponse = await API.post("/files/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
         const imageUrl = uploadResponse.data.url;
         console.log("✅ Image uploaded successfully:", imageUrl);
-        
+
         // Update the selectedPost state with the new image URL
         if (selectedPost) {
           setSelectedPost({
             ...selectedPost,
-            image: imageUrl
+            image: imageUrl,
           });
         }
       } catch (error) {
@@ -398,7 +386,7 @@ const Profile: React.FC = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:6060/posts/${postId}`, {
+      await API.delete(`/posts/${postId}`, {
         headers: { Authorization: `JWT ${token}` },
       });
 
@@ -425,8 +413,8 @@ const Profile: React.FC = () => {
 
     try {
       // Submit new comment
-      const response = await axios.post(
-        "http://localhost:6060/comments/",
+      const response = await API.post(
+        "/comments/",
         {
           postId: postId,
           content: commentInput[postId],
@@ -471,7 +459,7 @@ const Profile: React.FC = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:6060/comments/${commentId}`, {
+      await API.delete(`/comments/${commentId}`, {
         headers: { Authorization: `JWT ${token}` },
       });
 
@@ -533,6 +521,10 @@ const Profile: React.FC = () => {
         <div className="profile-nav-buttons">
           <button
             className="logout-button"
+            style={{
+              backgroundColor:
+                hoveredButton === "logout" ? "red" : "transparent",
+            }}
             onClick={handleLogout}
             onMouseEnter={() => setHoveredButton("logout")}
             onMouseLeave={() => setHoveredButton(null)}
@@ -721,7 +713,13 @@ const Profile: React.FC = () => {
                   <img src={selectedPost.image} alt="Post" />
                 ) : (
                   <div className="comments-modal-noimage">
-                    <p style={{ fontSize: "18px", marginBottom: "10px", color: "#333" }}>
+                    <p
+                      style={{
+                        fontSize: "18px",
+                        marginBottom: "10px",
+                        color: "#333",
+                      }}
+                    >
                       {selectedPost.title}
                     </p>
                     <p style={{ color: "#333" }}>{selectedPost.content}</p>
@@ -743,8 +741,8 @@ const Profile: React.FC = () => {
                 <div className="comments-post-info">
                   <img
                     src={
-                      typeof selectedPost.sender === "object" 
-                        ? selectedPost.sender.profilePic || avatar 
+                      typeof selectedPost.sender === "object"
+                        ? selectedPost.sender.profilePic || avatar
                         : avatar
                     }
                     alt="Profile"
@@ -753,16 +751,13 @@ const Profile: React.FC = () => {
                     <div className="post-sender">
                       {profile.name}{" "}
                       <span className="post-sender-username">
-                        @{
-                          typeof selectedPost.sender === "object" 
-                            ? selectedPost.sender.email.split("@")[0]
-                            : selectedPost.sender.split("@")[0]
-                        }
+                        @
+                        {typeof selectedPost.sender === "object"
+                          ? selectedPost.sender.email.split("@")[0]
+                          : selectedPost.sender.split("@")[0]}
                       </span>
                     </div>
-                    <p className="comments-post-title">
-                      {selectedPost.title}
-                    </p>
+                    <p className="comments-post-title">{selectedPost.title}</p>
                   </div>
                 </div>
 
@@ -783,14 +778,15 @@ const Profile: React.FC = () => {
                               </span>
                               <span className="comment-date">
                                 {comment.createdAt
-                                  ? new Date(
-                                      comment.createdAt
-                                    ).toLocaleString(undefined, {
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
+                                  ? new Date(comment.createdAt).toLocaleString(
+                                      undefined,
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      }
+                                    )
                                   : "Just now"}
                               </span>
                             </div>
@@ -828,8 +824,7 @@ const Profile: React.FC = () => {
                         className="icon"
                       />
                       <p>
-                        No comments yet. Be the first to share your
-                        thoughts!
+                        No comments yet. Be the first to share your thoughts!
                       </p>
                     </div>
                   )}
@@ -869,108 +864,108 @@ const Profile: React.FC = () => {
 
         {/* Edit Post Modal */}
         {isEditModalOpen && selectedPost && (
-  <div className="edit-modal-overlay">
-    <div className="edit-modal-content">
-      {/* Modal Header */}
-      <div className="edit-modal-header">
-        <h2>Edit Post</h2>
-        <button
-          className="close-button"
-          onClick={() => setEditModalOpen(false)}
-        >
-          ✖
-        </button>
-      </div>
+          <div className="edit-modal-overlay">
+            <div className="edit-modal-content">
+              {/* Modal Header */}
+              <div className="edit-modal-header">
+                <h2>Edit Post</h2>
+                <button
+                  className="close-button"
+                  onClick={() => setEditModalOpen(false)}
+                >
+                  ✖
+                </button>
+              </div>
 
-      {/* Input Fields */}
-      <input
-        type="text"
-        placeholder="Post Title"
-        value={selectedPost?.title || ""}
-        onChange={(e) =>
-          setSelectedPost((prev) =>
-            prev ? { ...prev, title: e.target.value } : null
-          )
-        }
-        className="edit-modal-input"
-      />
+              {/* Input Fields */}
+              <input
+                type="text"
+                placeholder="Post Title"
+                value={selectedPost?.title || ""}
+                onChange={(e) =>
+                  setSelectedPost((prev) =>
+                    prev ? { ...prev, title: e.target.value } : null
+                  )
+                }
+                className="edit-modal-input"
+              />
 
-      <textarea
-        placeholder="What's on your mind?"
-        value={selectedPost.content}
-        onChange={(e) =>
-          setSelectedPost({ ...selectedPost, content: e.target.value })
-        }
-        className="edit-modal-textarea"
-      />
+              <textarea
+                placeholder="What's on your mind?"
+                value={selectedPost.content}
+                onChange={(e) =>
+                  setSelectedPost({ ...selectedPost, content: e.target.value })
+                }
+                className="edit-modal-textarea"
+              />
 
-      {/* Category Select */}
-      <select
-        value={selectedPost.category || "Uncategorized"}
-        onChange={(e) =>
-          setSelectedPost({ ...selectedPost, category: e.target.value })
-        }
-        className="edit-modal-input"
-      >
-        <option value="Uncategorized">Select a Category</option>
-        <option value="Photography">Photography</option>
-        <option value="Gaming">Gaming</option>
-        <option value="Cooking">Cooking</option>
-        <option value="Sports">Sports</option>
-        <option value="Music">Music</option>
-      </select>
+              {/* Category Select */}
+              <select
+                value={selectedPost.category || "Uncategorized"}
+                onChange={(e) =>
+                  setSelectedPost({ ...selectedPost, category: e.target.value })
+                }
+                className="edit-modal-input"
+              >
+                <option value="Uncategorized">Select a Category</option>
+                <option value="Photography">Photography</option>
+                <option value="Gaming">Gaming</option>
+                <option value="Cooking">Cooking</option>
+                <option value="Sports">Sports</option>
+                <option value="Music">Music</option>
+              </select>
 
-      {/* Image Upload */}
-      <label className="edit-modal-uploadlabel">
-        📷 Add Image
-        <input
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={handleImageUpload}
-        />
-      </label>
+              {/* Image Upload */}
+              <label className="edit-modal-uploadlabel">
+                📷 Add Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleImageUpload}
+                />
+              </label>
 
-      {/* Show Image Preview if Available */}
-      {selectedPost.image && (
-        <img
-          src={selectedPost.image}
-          alt="Preview"
-          className="edit-modal-imagepreview"
-        />
-      )}
+              {/* Show Image Preview if Available */}
+              {selectedPost.image && (
+                <img
+                  src={selectedPost.image}
+                  alt="Preview"
+                  className="edit-modal-imagepreview"
+                />
+              )}
 
-      {/* Buttons */}
-      <div className="edit-modal-buttons">
-        <button
-          onClick={() => handleUpdatePost(selectedPost)}
-          className="update-button"
-        >
-          <RefreshCcw
-            size={17}
-            color="black"
-            strokeWidth={2}
-            style={{ marginRight: "5px" }}
-          />
-          Update Post
-        </button>
+              {/* Buttons */}
+              <div className="edit-modal-buttons">
+                <button
+                  onClick={() => handleUpdatePost(selectedPost)}
+                  className="update-button"
+                >
+                  <RefreshCcw
+                    size={17}
+                    color="black"
+                    strokeWidth={2}
+                    style={{ marginRight: "5px" }}
+                  />
+                  Update Post
+                </button>
 
-        <button
-          onClick={() => handleDeletePost(selectedPost._id)}
-          className="delete-button"
-        >
-          <Trash2
-            size={17}
-            color="red"
-            strokeWidth={2}
-            style={{ marginRight: "5px" }}
-          />
-          Delete Post
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                <button
+                  onClick={() => handleDeletePost(selectedPost._id)}
+                  className="delete-button"
+                >
+                  <Trash2
+                    size={17}
+                    color="red"
+                    strokeWidth={2}
+                    style={{ marginRight: "5px" }}
+                  />
+                  Delete Post
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Profile Modal */}

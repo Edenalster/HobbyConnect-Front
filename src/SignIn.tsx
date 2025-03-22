@@ -3,6 +3,7 @@ import "./SignIn.css";
 import { useNavigate } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import API from "./api/axios";
 
 interface IUser {
   email: string;
@@ -31,13 +32,7 @@ const SignIn: React.FC = () => {
     console.log("🔍 Sending login request with:", formData); // Debugging
 
     try {
-      const response = await axios.post(
-        "http://localhost:6060/auth/login",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" }, // ✅ Ensure JSON format
-        }
-      );
+      const response = await API.post("/auth/login", formData);
 
       if (response.status === 200) {
         const data = response.data;
@@ -60,7 +55,10 @@ const SignIn: React.FC = () => {
           "🛑 Login failed:",
           error.response?.data || error.message
         );
-        setMessage(error.response?.data?.message || "Login Failed. Incorrect Email or Password.");
+        setMessage(
+          error.response?.data?.message ||
+            "Login Failed. Incorrect Email or Password."
+        );
       } else {
         console.error("🛑 Login failed:", error);
         setMessage("Failed to log in.");
@@ -73,10 +71,7 @@ const SignIn: React.FC = () => {
   ): Promise<IUser> => {
     try {
       console.log("Google Signin!");
-      const res = await axios.post(
-        "http://localhost:6060/auth/google",
-        credentialResponse
-      );
+      const res = await API.post("/auth/google", credentialResponse);
       console.log("Google Signin success!", res.data);
 
       // Store tokens and user data

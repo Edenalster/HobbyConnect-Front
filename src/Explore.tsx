@@ -91,7 +91,7 @@ const Explore: React.FC = () => {
 
   // ✅ Ensure this useEffect fetches posts correctly
   useEffect(() => {
-    let url = `/posts?page=${page}&limit=10`;
+    let url = `/posts?page=${page}&limit=15`;
     if (selectedCategory) {
       url += `&category=${selectedCategory}`;
     }

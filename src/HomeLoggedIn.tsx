@@ -757,8 +757,11 @@ const HomeLoggedIn: React.FC = () => {
                         selectedPost.comments.map((comment) => (
                           <div key={comment._id} className="single-comment">
                             <img
-                              src={comment.profilePic || avatar}
+                              src={comment.profilePic || ""}
                               alt="User Avatar"
+                               onError={(e) =>{
+                                 e.currentTarget.src= avatar;
+                              }}
                             />
                             <div className="comment-text-wrapper">
                               <div className="comment-header">

@@ -3,6 +3,7 @@ import "./SignUp.css";
 import { useNavigate } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import API from "./api/axios";
 
 interface IUser {
   email: string;
@@ -29,13 +30,7 @@ const SignUp: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:6060/auth/register",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await API.post("/auth/register", formData);
 
       if (response.status === 200) {
         setMessage("User created successfully!");
@@ -57,8 +52,7 @@ const SignUp: React.FC = () => {
   const googleSignin = (credentialResponse: CredentialResponse) => {
     return new Promise<IUser>((resolve, reject) => {
       console.log("Google Signin!");
-      axios
-        .post("http://localhost:6060/auth/google", credentialResponse)
+      API.post("/auth/google", credentialResponse)
         .then((res) => {
           console.log("userID", res.data._id);
           console.log("Google Signin success!");

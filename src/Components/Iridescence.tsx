@@ -1,8 +1,6 @@
 import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
 
-import "./Iridescence.css";
-
 const vertexShader = `
 attribute vec2 uv;
 attribute vec2 position;
@@ -101,7 +99,9 @@ export default function Iridescence({
             gl.canvas.width / gl.canvas.height
           ),
         },
-        uMouse: { value: new Float32Array([mousePos.current.x, mousePos.current.y]) },
+        uMouse: {
+          value: new Float32Array([mousePos.current.x, mousePos.current.y]),
+        },
         uAmplitude: { value: amplitude },
         uSpeed: { value: speed },
       },
@@ -145,11 +145,5 @@ export default function Iridescence({
     };
   }, [color, speed, amplitude, mouseReact]);
 
-  return (
-    <div
-      ref={ctnDom}
-      className="iridescence-container"
-      {...rest}
-    />
-  );
+  return <div ref={ctnDom} className="iridescence-container" {...rest} />;
 }

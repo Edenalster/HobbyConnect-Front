@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import API from "./api/axios";
+import { Link } from "react-router-dom";
 
 interface IUser {
   email: string;
@@ -170,10 +171,8 @@ const SignIn: React.FC = () => {
 
         <div className="links">
           <p>
-            Don't have an account? <a href="/signup">Sign up</a>
-          </p>
-          <p>
-            <a href="/forgot-password">Forgot password?</a>
+          Don't have an account?{" "}
+          <Link to="/signup">Sign up</Link>
           </p>
         </div>
       </div>

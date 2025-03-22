@@ -1,16 +1,26 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* ✅ Ensures full-screen coverage */
-  width: 100vw;
-  background: linear-gradient(to bottom right, #cfe0fc, #ebf8ff, #ffffff);
-  background-size: cover; /* ✅ Prevents visible lines */
-  background-attachment: fixed; /* ✅ Fixes color difference */
-  font-family: sans-serif;
+/* Reset everything to ensure consistent starting point */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* Base styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: linear-gradient(to bottom right, #cfe0fc, #ebf8ff, #ffffff);
+  background-size: cover;
+  background-attachment: fixed;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+/* Header with proper z-index and spacing */
 .explore-header {
   display: flex;
   justify-content: space-between;
@@ -22,7 +32,8 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 1000;
+  height: 60px;
 }
 
 .explore-logo {
@@ -39,10 +50,8 @@ body {
   display: flex;
   gap: 15px;
   align-items: center;
-  margin-right: 50px;
 }
 
-/* "Logout" button in the header */
 .explore-logout-btn {
   display: flex;
   align-items: center;
@@ -55,42 +64,30 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
-  outline: none;
 }
 
-.explore-logout-btn:hover {
-  box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
-  transform: translateY(-2px);
-}
-
+/* Sidebar with fixed height and position */
 .explore-aside {
   width: 250px;
-  height: 34vh;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   position: fixed;
-  left: 1rem;
-  top: 2rem;
+  left: 16px;
+  top: 75px; /* Position below the header */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem;
+  padding: 16px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-  margin-top: 60px;
-  z-index: 2;
+  z-index: 900;
 }
 
-/* Nav Container in the Aside */
 .explore-aside-nav {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  flex-grow: 1; /* Navigation items push the profile to bottom */
+  gap: 0.5rem;
 }
 
-/* Buttons within .explore-aside-nav */
 .explore-aside-button {
   display: flex;
   align-items: center;
@@ -105,14 +102,12 @@ body {
   font-weight: 500;
   color: #555;
   transition: all 0.2s ease-in-out;
-  outline: none;
 }
 
 .explore-aside-button:hover {
   background: #b9cfff;
 }
 
-/* Divider within the aside */
 .explore-aside-divider {
   width: 100%;
   height: 1px;
@@ -120,7 +115,6 @@ body {
   margin-top: 10px;
 }
 
-/* Sidebar Profile Button */
 .explore-aside-profile {
   border-top: 1px solid #e0e0e0;
   border: none;
@@ -132,13 +126,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 400px;
-  transition: background 0.2s ease;
-  outline: none;
-}
-
-.explore-aside-profile:hover {
-  background: #b9cfff;
+  margin-top: 10px;
 }
 
 .explore-aside-profile img {
@@ -160,57 +148,49 @@ body {
   margin: 0;
 }
 
+/* Main content container with proper positioning */
 .explore-main-content {
-  flex: 1; /* allows this area to expand */
-  padding-left: 17rem; /* same left padding as your sidebar */
-  width: auto;
-  min-height: 200vh; /* ensures a tall area */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding-top: 850px; /* enough space under the header */
+  width: calc(100% - 300px); /* Account for sidebar width + padding */
+  margin-left: 280px; /* Make space for sidebar */
+  margin-top: 75px; /* Make space for header */
+  padding: 20px 10px; /* Add horizontal padding */
   position: relative;
-  margin-top: -250px;
 }
 
-/* Outer container (white box) */
+/* Search wrapper with fixed position and size */
 .explore-search-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  width: 100%;
+  max-width: 800px;
   background: white;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 1000px;
-  margin-top: 150px;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 10;
 }
 
-/* Title/H2 styling */
 .explore-search-heading {
   font-size: 24px;
   font-weight: bold;
   color: #333;
-  margin: 0 0 15px; /* Adjust spacing below the heading if needed */
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-/* Search Bar Container */
 .explore-search-bar {
   width: 100%;
   display: flex;
   align-items: center;
   border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 10px;
-  background: #fff;
-  position: relative; /* For autocomplete results absolute positioning */
-  z-index: 100; /* Keep above other elements */
+  padding: 10px 15px;
+  background: #f9f9f9;
 }
 
-/* The input element inside the search bar */
 .explore-search-input {
   flex: 1;
   border: none;
@@ -219,10 +199,9 @@ body {
   background: transparent;
 }
 
-/* Autocomplete Suggestions Container */
 .explore-suggestions {
   position: absolute;
-  top: calc(100% + 5px);
+  top: calc(100% - 10px);
   left: 0;
   width: 100%;
   background: white;
@@ -231,90 +210,102 @@ body {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   padding: 5px 0;
   list-style: none;
-  max-height: 100px;
+  max-height: 200px;
   overflow-y: auto;
-  z-index: 101;
+  z-index: 11;
+  margin-top: 5px;
 }
 
-/* Single suggestion <li> */
 .explore-suggestion-item {
-  padding: 10px;
+  padding: 10px 15px;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
-/* Hover style for suggestion items */
 .explore-suggestion-item:hover {
   background: #f0f0f0;
 }
 
+/* Post grid with better spacing */
 .explore-posts-grid {
-  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
   width: 100%;
   max-width: 1100px;
-  text-align: center;
-  display: grid;
-  grid-template-columns: repeat(3, 0.7fr);
-  gap: 20px;
-  font-size: 14px;
-  margin-top: 10px;
-  align-content: start;
-  align-items: start;
-  min-height: 600px;
-  transition: all 0.3s ease;
+  margin-top: 0;
 }
 
-/* Post Container */
+/* Post card with consistent styling */
 .explore-post {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  text-align: left;
-  padding: 20px;
   background: white;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-  height: auto; /* allows dynamic height */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
 }
 
-/* Post Image */
+.explore-post:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
 .explore-post-image {
   width: 100%;
-  height: 250px;
+  height: 180px;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
 }
 
-/* Category Tag */
 .explore-post-category {
+  display: inline-block;
   font-size: 12px;
   font-weight: bold;
-  color: gray;
+  color: #666;
   background-color: #f0f0f0;
   padding: 4px 8px;
   border-radius: 10px;
-  display: inline-block;
-  margin-bottom: 10px;
+  margin: 12px 15px 5px 15px;
 }
 
-/* Post Title */
 .explore-post-title {
   font-weight: bold;
   font-size: 18px;
-  margin-bottom: 8px;
+  margin: 5px 15px 10px 15px;
+  color: #333;
+}
+
+.explore-post p {
+  margin: 0 15px 15px 15px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+/* Post footer - likes, comments */
+.explore-post > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 15px 15px 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
 }
 
 .next-page-button {
   background-color: transparent;
-  color: black;
-  border: none;
+  color: #444;
+  border: 1px solid #ddd;
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 600;
+  margin: 20px 0;
   transition: all 0.2s ease;
 }
 
@@ -322,158 +313,19 @@ body {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Container to ensure consistent layout */
-.explore-container {
-  max-width: 1200px;
-  width: 90%;
-  padding-top: 80px;
-}
-
-/* Card styles for posts */
-.explore-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: all 0.3s ease-in-out;
-}
-
-.explore-card:hover {
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
-}
-
-.search-container {
-  width: 100%;
-  min-height: 50px;
-  position: relative;
-  z-index: 10;
-  margin-top: 20px;
-}
-
-.search-results {
-  position: absolute;
-  top: calc(100% + 5px);
-  width: 100%;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-/* 
-  =======================
-     RESPONSIVE STYLES
-  =======================
-*/
-
-/* For medium screens (tablets, small laptops) */
-@media (max-width: 992px) {
-  /* Reduce aside width, main content padding */
-  .explore-aside {
-    width: 200px;
-  }
-  .explore-main-content {
-    padding-left: 14rem;
-  }
-  /* Adjust the search wrapper width */
-  .explore-search-wrapper {
-    width: 80%;
-    max-width: 800px;
-  }
-  /* Posts grid with 2 columns on medium screens */
-  .explore-posts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* For tablets and smaller devices (portrait tablets, large phones) */
-@media (max-width: 768px) {
-  /* Hide or reposition aside for smaller screens */
-  .explore-aside {
-    position: static;
-    width: auto;
-    margin-top: 0;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    overflow-x: auto;
-    gap: 1rem;
-  }
-
-  /* Reduce main content top/left padding so it’s more compact */
-  .explore-main-content {
-    padding-left: 1rem;
-    padding-top: 200px; /* Enough space for the header + aside if needed */
-  }
-
-  /* Make the search wrapper fill more of the screen width */
-  .explore-search-wrapper {
-    width: 90%;
-    max-width: 600px;
-    margin-top: 100px;
-  }
-
-  /* Posts grid with 1 column */
-  .explore-posts-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* For mobile screens (small phones) */
-@media (max-width: 480px) {
-  .explore-logo {
-    font-size: 18px;
-  }
-  .explore-logout-btn {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-
-  /* Tweak aside nav button font-size */
-  .explore-aside-button {
-    font-size: 14px;
-  }
-
-  /* Further reduce search wrapper width */
-  .explore-search-wrapper {
-    width: 90%;
-    margin-top: 80px;
-  }
-
-  /* Adjust heading & post titles for smaller screens */
-  .explore-search-heading {
-    font-size: 20px;
-  }
-  .explore-post-title {
-    font-size: 16px;
-  }
-}
-
-@media (min-width: 1920px) {
-  .explore-main-content {
-    padding-left: 14rem;
-    padding-top: 850px;
-    margin-top: 40px;
-  }
-}
-
+/* Comments modal styling */
 .comments-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  backdrop-filter: blur(2px);
-  margin-top: 25px; /* if you want the modal shifted down */
+  z-index: 2000;
+  backdrop-filter: blur(3px);
 }
 
 .comments-modal-container {
@@ -483,24 +335,24 @@ body {
   background: white;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.3);
-  color: black;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Left Side: Post Image or No Image */
 .comments-modal-left {
   flex: 2;
+  background-color: #f5f5f5;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #dedcdc;
   position: relative;
 }
+
 .comments-modal-left img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
+
 .comments-modal-noimage {
   display: flex;
   flex-direction: column;
@@ -514,37 +366,34 @@ body {
   background: #f5f5f5;
 }
 
-/* Right Side: Comments Section */
 .comments-modal-right {
   flex: 1.2;
   background: #fff;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   border-left: 1px solid #eaeaea;
   position: relative;
 }
 
-/* Close Button (X icon) */
 .comments-modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.8);
   border: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: #555;
-  padding: 5px;
   border-radius: 50%;
-  transition: background 0.2s ease;
-  outline: none;
-}
-.comments-modal-close:hover {
-  background: #f0f0f0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #444;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Post Info in Comments Modal */
 .comments-post-info {
   padding: 20px;
   border-bottom: 1px solid #eaeaea;
@@ -552,42 +401,44 @@ body {
   align-items: center;
   gap: 12px;
 }
+
 .comments-post-info img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
 }
-.comments-post-info .post-info-text {
+
+.post-info-text {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 14px;
-  color: #333;
 }
-.comments-post-info .post-info-text .post-sender {
+
+.post-sender {
   font-weight: 600;
+  font-size: 14px;
 }
-.comments-post-info .post-info-text .post-sender-username {
+
+.post-sender-username {
   font-weight: normal;
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
 }
+
 .comments-post-title {
   margin: 4px 0 0 0;
   font-size: 14px;
   color: #333;
 }
 
-/* Comments List */
 .comments-list {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 20px;
-  background-color: #fafafa;
+  padding: 15px;
+  background-color: #f9f9f9;
 }
 
-/* Single comment container */
 .single-comment {
   display: flex;
   margin-bottom: 16px;
@@ -596,6 +447,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
+
 .single-comment img {
   width: 40px;
   height: 40px;
@@ -603,33 +455,35 @@ body {
   object-fit: cover;
   margin-right: 12px;
 }
+
 .comment-text-wrapper {
   flex: 1;
 }
+
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 6px;
 }
+
 .comment-sender {
   font-weight: 600;
   font-size: 14px;
 }
+
 .comment-date {
   font-size: 12px;
   color: #888;
   margin-left: 8px;
 }
+
 .single-comment p {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  color: #333;
-  word-break: break-word;
 }
 
-/* Delete Button in comment header */
 .comment-delete-button {
   background: none;
   border: none;
@@ -637,61 +491,181 @@ body {
   padding: 4px;
   border-radius: 4px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-}
-.comment-delete-button:hover {
-  background-color: #f0f0f0;
 }
 
-/* If no comments yet */
 .no-comments {
   text-align: center;
-  padding: 20px;
+  padding: 30px 20px;
   color: #888;
-  outline: none;
-}
-.no-comments .icon {
-  margin-bottom: 5px;
 }
 
-/* Comment Input Section at the bottom */
 .comment-input-section {
-  padding: 16px 20px;
+  padding: 15px;
   border-top: 1px solid #eaeaea;
   background-color: #fff;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .comment-input-field {
   flex: 1;
-  padding: 10px;
+  padding: 12px 15px;
   border-radius: 20px;
   border: 1px solid #ddd;
   font-size: 14px;
+  outline: none;
 }
+
 .comment-submit-button {
-  margin-left: 10px;
   background-color: #1e3c72;
   color: white;
   border: none;
-  padding: 8px 12px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
-.comment-submit-button:hover {
-  filter: brightness(1.1);
+
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+  .explore-posts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* Hover effect for post cards */
-.explore-post {
-  transition: all 0.2s ease-in-out;
+@media (max-width: 992px) {
+  .explore-aside {
+    width: 200px;
+  }
+  
+  .explore-main-content {
+    width: calc(100% - 220px);
+    margin-left: 210px;
+  }
 }
 
-.explore-post:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+@media (max-width: 768px) {
+  .explore-header {
+    padding: 10px 15px;
+  }
+  
+  .explore-aside {
+    top: 60px;
+    left: 0;
+    width: 100%;
+    border-radius: 0;
+    padding: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .explore-aside-nav {
+    flex-direction: row;
+    margin-right: 10px;
+  }
+  
+  .explore-aside-button {
+    padding: 8px 15px;
+    margin-top: 0;
+  }
+  
+  .explore-aside-divider {
+    display: none;
+  }
+  
+  .explore-aside-profile {
+    margin-left: auto;
+    margin-top: 0;
+  }
+  
+  .explore-main-content {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 120px;
+    padding: 15px;
+  }
+  
+  .explore-posts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comments-modal-container {
+    flex-direction: column;
+    width: 95%;
+    height: 95%;
+  }
+  
+  .comments-modal-left {
+    height: 40%;
+  }
+  
+  .comments-modal-right {
+    height: 60%;
+  }
+}
+
+@media (max-width: 480px) {
+  .explore-header {
+    padding: 10px;
+  }
+  
+  .explore-logo {
+    font-size: 20px;
+  }
+  
+  .explore-logout-btn span {
+    display: none;
+  }
+  
+  .explore-search-heading {
+    font-size: 20px;
+  }
+  
+  .explore-post-title {
+    font-size: 16px;
+  }
+  
+  .explore-profile-username {
+    display: none;
+  }
+}
+
+/* TARGETED FIXES FOR EXPLORE PAGE */
+/* These ensure the layout works without affecting other pages */
+
+/* Fix main content positioning to ensure search box is visible */
+.explore-main-content {
+  margin-top: 75px !important; /* Overrides any existing margins */
+}
+
+/* Ensure search wrapper is visible and positioned correctly */
+.explore-search-wrapper {
+  position: relative;
+  margin-top: 15px !important; /* Ensure it doesn't get pushed down */
+  margin-bottom: 20px;
+  z-index: 10;
+}
+
+/* Ensure posts grid is positioned correctly relative to search */
+.explore-posts-grid {
+  margin-top: 0 !important; /* Override any margins pushing it down */
+}
+
+/* Fix sidebar height to prevent excessive stretching */
+.explore-aside {
+  height: auto;
+  max-height: 80vh;
+}
+
+/* Home page hero section fix to prevent spacing issues */
+/* This selector only targets the hero section on the Home page, not explore components */
+.hero-section {
+  margin-top: 0 !important; 
 }

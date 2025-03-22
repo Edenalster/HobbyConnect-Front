@@ -187,7 +187,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  margin-top: 120px;
+  margin-top: 110px; /* Adjusted from 120px for better positioning */
   margin-left: 20px;
 }
 
@@ -216,19 +216,30 @@
   gap: 10px; /* slight gap between items if desired */
 }
 
-/* Name + Edit button row */
+/* Name + Edit button row - IMPROVED SPACING */
 .profile-name-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 15px; /* Added space between name and username rows */
 }
 
-/* Username + Post count row */
+/* Username + Post count row - IMPROVED SPACING */
 .profile-user-row {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-top: -30px;
+  gap: 20px; /* Increased from 15px for better spacing */
+  margin-top: 0; /* Removed negative margin that was causing elements to be too close */
+}
+
+/* Improve spacing for post counts and icons */
+.profile-user-row span {
+  margin-right: 5px; /* Added space between text and counts */
+}
+
+/* Settings button improved spacing */
+.settings-button {
+  margin-left: 15px; /* Added more space from adjacent elements */
 }
 
 /* Bio below the blue section */
@@ -242,16 +253,17 @@
   background-color: transparent;
   border-radius: 10px;
   padding: 20px;
-  margin-top: 0px; /* keeps bio right below the blue section */
+  margin-top: 70px;
   position: relative;
 }
 
-/* --- User's Posts Section --- */
+
+/* --- User's Posts Section --- MOVED LOWER */
 .posts-section {
   padding: 20px;
   max-width: 1200px;
   margin-left: 20rem;
-  margin-top: 40px;
+  margin-top: 130px; /* Increased from 110px to move it lower */
   max-height: calc(100vh - 250px); /* Adjusts height based on screen size */
 }
 
@@ -260,6 +272,7 @@
   flex-direction: column;
   align-items: flex-start;
   max-width: 85%;
+  margin-bottom: 20px; /* Added for better spacing with posts below */
 }
 
 /* Posts Grid Layout */

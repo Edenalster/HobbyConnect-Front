@@ -419,6 +419,7 @@ const Profile: React.FC = () => {
           postId: postId,
           content: commentInput[postId],
           sender: profile.email,
+          profilePic:profile.profilePic
         },
         { headers: { Authorization: `JWT ${token}` } }
       );
@@ -768,7 +769,7 @@ const Profile: React.FC = () => {
                       <div key={comment._id} className="single-comment">
                         <img
                           src={comment.profilePic || avatar}
-                          alt="User Avatar"
+                          alt="Profile"
                         />
                         <div className="comment-text-wrapper">
                           <div className="comment-header">

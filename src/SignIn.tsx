@@ -60,7 +60,7 @@ const SignIn: React.FC = () => {
           "🛑 Login failed:",
           error.response?.data || error.message
         );
-        setMessage(error.response?.data?.message || "Failed to log in.");
+        setMessage(error.response?.data?.message || "Login Failed. Incorrect Email or Password.");
       } else {
         console.error("🛑 Login failed:", error);
         setMessage("Failed to log in.");

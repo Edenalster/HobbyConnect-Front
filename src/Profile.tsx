@@ -14,6 +14,7 @@ import {
   Settings,
   Home,
   Compass,
+  Send,
 } from "lucide-react";
 import Loading from "./Components/loading";
 
@@ -21,11 +22,23 @@ interface Post {
   _id: string;
   title: string;
   content: string;
-  sender: string;
+  sender: string | {
+    name: string;
+    email: string;
+    profilePic?: string;
+  };
   image?: string;
   category: string;
   likes?: string[];
-  comments?: string[];
+  comments?: Comment[];
+  createdAt: string;
+}
+
+interface Comment {
+  _id: string;
+  sender: string;
+  comment: string;
+  profilePic?: string;
   createdAt: string;
 }
 
@@ -37,6 +50,10 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [hoveredPostId, setHoveredPostId] = useState<string | null>(null);
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const [isCommentModalOpen, setCommentModalOpen] = useState(false);
+  const [commentInput, setCommentInput] = useState<{
+    [postId: string]: string;
+  }>({});
 
   // Profile state
   const [profile, setProfile] = useState({
@@ -106,7 +123,34 @@ const Profile: React.FC = () => {
           const formattedPosts = await Promise.all(
             postsResponse.data.map(async (post: Post) => {
               const comments = await fetchComments(post._id);
-              return { ...post, comments: comments || [] }; // ✅ Attach comments to post
+              
+              // Format post.sender as an object if it's a string
+              let senderData = post.sender;
+              if (typeof post.sender === 'string') {
+                try {
+                  const userResponse = await axios.get(
+                    `http://localhost:6060/auth/user-by-email/${post.sender}`
+                  );
+                  senderData = userResponse.data || {
+                    name: "Unknown User",
+                    email: post.sender,
+                    profilePic: avatar
+                  };
+                } catch (error) {
+                  console.error(`Error fetching user for email: ${post.sender}`, error);
+                  senderData = {
+                    name: "Unknown User",
+                    email: post.sender,
+                    profilePic: avatar
+                  };
+                }
+              }
+              
+              return { 
+                ...post, 
+                sender: senderData,
+                comments: comments || [] 
+              };
             })
           );
 
@@ -139,7 +183,34 @@ const Profile: React.FC = () => {
         const formattedPosts = await Promise.all(
           postsResponse.data.map(async (post: Post) => {
             const comments = await fetchComments(post._id); // ✅ Fetch comments for each post
-            return { ...post, comments: comments || [] }; // ✅ Attach comments to the post
+            
+            // Format post.sender as an object if it's a string
+            let senderData = post.sender;
+            if (typeof post.sender === 'string') {
+              try {
+                const userResponse = await axios.get(
+                  `http://localhost:6060/auth/user-by-email/${post.sender}`
+                );
+                senderData = userResponse.data || {
+                  name: "Unknown User",
+                  email: post.sender,
+                  profilePic: avatar
+                };
+              } catch (error) {
+                console.error(`Error fetching user for email: ${post.sender}`, error);
+                senderData = {
+                  name: "Unknown User",
+                  email: post.sender,
+                  profilePic: avatar
+                };
+              }
+            }
+            
+            return { 
+              ...post, 
+              sender: senderData,
+              comments: comments || [] 
+            };
           })
         );
 
@@ -150,6 +221,7 @@ const Profile: React.FC = () => {
       console.error("❌ Error fetching user posts:", error);
     }
   };
+  
   const fetchComments = async (postId: string) => {
     try {
       const response = await axios.get(
@@ -285,6 +357,99 @@ const Profile: React.FC = () => {
       setEditModalOpen(false); // Close modal after deletion
     } catch (error) {
       console.error("Error deleting post:", error);
+    }
+  };
+
+  // New function to handle comment submission
+  const handleCommentSubmit = async (postId: string) => {
+    if (!commentInput[postId]) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Session expired! Please log in again.");
+      return;
+    }
+
+    try {
+      // Submit new comment
+      const response = await axios.post(
+        "http://localhost:6060/comments/",
+        {
+          postId: postId,
+          content: commentInput[postId],
+          sender: profile.email,
+        },
+        { headers: { Authorization: `JWT ${token}` } }
+      );
+
+      console.log("✅ New Comment Response:", response.data);
+
+      // Fetch updated comments after submission
+      const updatedComments = await fetchComments(postId);
+
+      // Update posts state with new comments
+      setUserPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId ? { ...post, comments: updatedComments } : post
+        )
+      );
+
+      // Update selected post in modal (if open)
+      if (selectedPost && selectedPost._id === postId) {
+        setSelectedPost((prev) => ({
+          ...prev!,
+          comments: updatedComments,
+        }));
+      }
+
+      // Clear the input field
+      setCommentInput((prev) => ({ ...prev, [postId]: "" }));
+    } catch (error) {
+      console.error("❌ Error submitting comment:", error);
+    }
+  };
+
+  // New function to handle comment deletion
+  const handleDeleteComment = async (commentId: string, postId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Session expired! Please log in again.");
+      return;
+    }
+
+    try {
+      await axios.delete(`http://localhost:6060/comments/${commentId}`, {
+        headers: { Authorization: `JWT ${token}` },
+      });
+
+      // Update comments in state for posts
+      setUserPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? {
+                ...post,
+                comments: post.comments?.filter(
+                  (comment) => comment._id !== commentId
+                ),
+              }
+            : post
+        )
+      );
+
+      // Update comments in selectedPost (if modal is open)
+      if (selectedPost && selectedPost._id === postId) {
+        setSelectedPost({
+          ...selectedPost,
+          comments: selectedPost.comments?.filter(
+            (comment) => comment._id !== commentId
+          ),
+        });
+      }
+
+      console.log(`✅ Deleted comment with ID: ${commentId}`);
+    } catch (error) {
+      console.error("❌ Error deleting comment:", error);
+      alert("Failed to delete comment. Please try again.");
     }
   };
 
@@ -427,6 +592,10 @@ const Profile: React.FC = () => {
               className="post-card"
               onMouseEnter={() => setHoveredPostId(post._id)}
               onMouseLeave={() => setHoveredPostId(null)}
+              onClick={() => {
+                setSelectedPost(post);
+                setCommentModalOpen(true);
+              }}
             >
               {/* Post Image */}
               {post.image && (
@@ -489,6 +658,163 @@ const Profile: React.FC = () => {
           ))}
         </div>
 
+        {/* Comment Modal - Similar to HomeLoggedIn.tsx */}
+        {isCommentModalOpen && selectedPost && (
+          <div className="comments-modal-overlay">
+            <div className="comments-modal-container">
+              {/* Left Side: Post Image */}
+              <div className="comments-modal-left">
+                {selectedPost.image ? (
+                  <img src={selectedPost.image} alt="Post" />
+                ) : (
+                  <div className="comments-modal-noimage">
+                    <p style={{ fontSize: "18px", marginBottom: "10px", color: "#333" }}>
+                      {selectedPost.title}
+                    </p>
+                    <p style={{ color: "#333" }}>{selectedPost.content}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side: Comments Section */}
+              <div className="comments-modal-right">
+                {/* Close Button */}
+                <button
+                  onClick={() => setCommentModalOpen(false)}
+                  className="comments-modal-close"
+                >
+                  ✖
+                </button>
+
+                {/* Post Info */}
+                <div className="comments-post-info">
+                  <img
+                    src={
+                      typeof selectedPost.sender === "object" 
+                        ? selectedPost.sender.profilePic || avatar 
+                        : avatar
+                    }
+                    alt="Profile"
+                  />
+                  <div className="post-info-text">
+                    <div className="post-sender">
+                      {profile.name}{" "}
+                      <span className="post-sender-username">
+                        @{
+                          typeof selectedPost.sender === "object" 
+                            ? selectedPost.sender.email.split("@")[0]
+                            : selectedPost.sender.split("@")[0]
+                        }
+                      </span>
+                    </div>
+                    <p className="comments-post-title">
+                      {selectedPost.title}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Comments List */}
+                <div className="comments-list">
+                  {selectedPost.comments && selectedPost.comments.length > 0 ? (
+                    selectedPost.comments.map((comment) => (
+                      <div key={comment._id} className="single-comment">
+                        <img
+                          src={comment.profilePic || avatar}
+                          alt="User Avatar"
+                        />
+                        <div className="comment-text-wrapper">
+                          <div className="comment-header">
+                            <div>
+                              <span className="comment-sender">
+                                @{comment.sender?.split("@")[0]}
+                              </span>
+                              <span className="comment-date">
+                                {comment.createdAt
+                                  ? new Date(
+                                      comment.createdAt
+                                    ).toLocaleString(undefined, {
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                  : "Just now"}
+                              </span>
+                            </div>
+
+                            {/* Delete Button */}
+                            {comment.sender === profile.email && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteComment(
+                                    comment._id,
+                                    selectedPost._id
+                                  );
+                                }}
+                                className="comment-delete-button"
+                              >
+                                <Trash2
+                                  size={16}
+                                  color="#ff5252"
+                                  strokeWidth={2}
+                                />
+                              </button>
+                            )}
+                          </div>
+                          <p>{comment.comment}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-comments">
+                      <MessageSquare
+                        size={40}
+                        color="#ddd"
+                        strokeWidth={1.5}
+                        className="icon"
+                      />
+                      <p>
+                        No comments yet. Be the first to share your
+                        thoughts!
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Comment Input */}
+                <div className="comment-input-section">
+                  <input
+                    type="text"
+                    placeholder="Add a comment..."
+                    value={commentInput[selectedPost._id] || ""}
+                    onChange={(e) =>
+                      setCommentInput((prev) => ({
+                        ...prev,
+                        [selectedPost._id]: e.target.value,
+                      }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleCommentSubmit(selectedPost._id);
+                      }
+                    }}
+                    className="comment-input-field"
+                  />
+                  <button
+                    onClick={() => handleCommentSubmit(selectedPost._id)}
+                    className="comment-submit-button"
+                  >
+                    <Send size={18} style={{ margin: "1.5px" }} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Post Modal */}
         {isEditModalOpen && selectedPost && (
           <div className="edit-modal-overlay">
             <div className="edit-modal-content">

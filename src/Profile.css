@@ -570,3 +570,228 @@
     gap: 20px;
   }
 }
+
+.comments-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(2px);
+  margin-top: 25px; /* if you want the modal shifted down */
+}
+
+.comments-modal-container {
+  display: flex;
+  width: 85%;
+  height: 85%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.3);
+  color: black;
+}
+
+/* Left Side: Post Image or No Image */
+.comments-modal-left {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #dedcdc;
+  position: relative;
+}
+.comments-modal-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.comments-modal-noimage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #333;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+}
+
+/* Right Side: Comments Section */
+.comments-modal-right {
+  flex: 1.2;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 1px solid #eaeaea;
+  position: relative;
+}
+
+/* Close Button (X icon) */
+.comments-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+  outline: none;
+}
+.comments-modal-close:hover {
+  background: #f0f0f0;
+}
+
+/* Post Info in Comments Modal */
+.comments-post-info {
+  padding: 20px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.comments-post-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.comments-post-info .post-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #333;
+}
+.comments-post-info .post-info-text .post-sender {
+  font-weight: 600;
+}
+.comments-post-info .post-info-text .post-sender-username {
+  font-weight: normal;
+  color: #666;
+  font-size: 14px;
+}
+.comments-post-title {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Comments List */
+.comments-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 20px;
+  background-color: #fafafa;
+}
+
+/* Single comment container */
+.single-comment {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.single-comment img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+.comment-text-wrapper {
+  flex: 1;
+}
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.comment-sender {
+  font-weight: 600;
+  font-size: 14px;
+}
+.comment-date {
+  font-size: 12px;
+  color: #888;
+  margin-left: 8px;
+}
+.single-comment p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  word-break: break-word;
+}
+
+/* Delete Button in comment header */
+.comment-delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+.comment-delete-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* If no comments yet */
+.no-comments {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  outline: none;
+}
+.no-comments .icon {
+  margin-bottom: 5px;
+}
+
+/* Comment Input Section at the bottom */
+.comment-input-section {
+  padding: 16px 20px;
+  border-top: 1px solid #eaeaea;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.comment-input-field {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+.comment-submit-button {
+  margin-left: 10px;
+  background-color: #1e3c72;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+}
+.comment-submit-button:hover {
+  filter: brightness(1.1);
+}

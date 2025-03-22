@@ -311,23 +311,76 @@ const Profile: React.FC = () => {
         return;
       }
 
-      await axios.put(
+      // Create a payload with only the fields that can be updated
+      const postData = {
+        title: updatedPost.title,
+        content: updatedPost.content,
+        image: updatedPost.image,
+        category: updatedPost.category || "Uncategorized"
+      };
+
+      console.log("Updating post with data:", postData);
+
+      // Send the update request
+      const response = await axios.put(
         `http://localhost:6060/posts/${updatedPost._id}`,
-        updatedPost,
+        postData,
         {
-          headers: { Authorization: `JWT ${token}` },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `JWT ${token}` 
+          },
         }
       );
 
+      console.log("Post update response:", response.data);
+
+      // Update the posts in state to show the changes
       setUserPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
+          post._id === updatedPost._id ? {...post, ...postData} : post
         )
       );
 
-      setEditModalOpen(false); // Close modal
+      // Close the edit modal
+      setEditModalOpen(false);
     } catch (error) {
       console.error("Error updating post:", error);
+      alert("Error updating post. Please try again.");
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      console.log("📤 Uploading image to server...");
+  
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      try {
+        const uploadResponse = await axios.post(
+          "http://localhost:6060/files/upload",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+  
+        const imageUrl = uploadResponse.data.url;
+        console.log("✅ Image uploaded successfully:", imageUrl);
+        
+        // Update the selectedPost state with the new image URL
+        if (selectedPost) {
+          setSelectedPost({
+            ...selectedPost,
+            image: imageUrl
+          });
+        }
+      } catch (error) {
+        console.error("🛑 Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
+      }
     }
   };
 
@@ -816,100 +869,108 @@ const Profile: React.FC = () => {
 
         {/* Edit Post Modal */}
         {isEditModalOpen && selectedPost && (
-          <div className="edit-modal-overlay">
-            <div className="edit-modal-content">
-              {/* Modal Header */}
-              <div className="edit-modal-header">
-                <h2>Edit Post</h2>
-                <button
-                  className="close-button"
-                  onClick={() => setEditModalOpen(false)}
-                >
-                  ✖
-                </button>
-              </div>
+  <div className="edit-modal-overlay">
+    <div className="edit-modal-content">
+      {/* Modal Header */}
+      <div className="edit-modal-header">
+        <h2>Edit Post</h2>
+        <button
+          className="close-button"
+          onClick={() => setEditModalOpen(false)}
+        >
+          ✖
+        </button>
+      </div>
 
-              {/* Input Fields */}
-              <input
-                type="text"
-                placeholder="Post Title"
-                value={selectedPost?.title || ""}
-                onChange={(e) =>
-                  setSelectedPost((prev) =>
-                    prev ? { ...prev, title: e.target.value } : null
-                  )
-                }
-                className="edit-modal-input"
-              />
+      {/* Input Fields */}
+      <input
+        type="text"
+        placeholder="Post Title"
+        value={selectedPost?.title || ""}
+        onChange={(e) =>
+          setSelectedPost((prev) =>
+            prev ? { ...prev, title: e.target.value } : null
+          )
+        }
+        className="edit-modal-input"
+      />
 
-              <textarea
-                placeholder="What's on your mind?"
-                value={selectedPost.content}
-                onChange={(e) =>
-                  setSelectedPost({ ...selectedPost, content: e.target.value })
-                }
-                className="edit-modal-textarea"
-              />
+      <textarea
+        placeholder="What's on your mind?"
+        value={selectedPost.content}
+        onChange={(e) =>
+          setSelectedPost({ ...selectedPost, content: e.target.value })
+        }
+        className="edit-modal-textarea"
+      />
 
-              {/* Image Upload */}
-              <label className="edit-modal-uploadlabel">
-                📷 Add Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      const file = e.target.files[0];
-                      setSelectedPost({
-                        ...selectedPost,
-                        image: URL.createObjectURL(file),
-                      });
-                    }
-                  }}
-                />
-              </label>
+      {/* Category Select */}
+      <select
+        value={selectedPost.category || "Uncategorized"}
+        onChange={(e) =>
+          setSelectedPost({ ...selectedPost, category: e.target.value })
+        }
+        className="edit-modal-input"
+      >
+        <option value="Uncategorized">Select a Category</option>
+        <option value="Photography">Photography</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Cooking">Cooking</option>
+        <option value="Sports">Sports</option>
+        <option value="Music">Music</option>
+      </select>
 
-              {/* Show Image Preview if Available */}
-              {selectedPost.image && (
-                <img
-                  src={selectedPost.image}
-                  alt="Preview"
-                  className="edit-modal-imagepreview"
-                />
-              )}
+      {/* Image Upload */}
+      <label className="edit-modal-uploadlabel">
+        📷 Add Image
+        <input
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleImageUpload}
+        />
+      </label>
 
-              {/* Buttons */}
-              <div className="edit-modal-buttons">
-                <button
-                  onClick={() => selectedPost && handleUpdatePost(selectedPost)}
-                  className="update-button"
-                >
-                  <RefreshCcw
-                    size={17}
-                    color="black"
-                    strokeWidth={2}
-                    style={{ marginRight: "5px" }}
-                  />
-                  Update Post
-                </button>
+      {/* Show Image Preview if Available */}
+      {selectedPost.image && (
+        <img
+          src={selectedPost.image}
+          alt="Preview"
+          className="edit-modal-imagepreview"
+        />
+      )}
 
-                <button
-                  onClick={() => handleDeletePost(selectedPost._id)}
-                  className="delete-button"
-                >
-                  <Trash2
-                    size={17}
-                    color="red"
-                    strokeWidth={2}
-                    style={{ marginRight: "5px" }}
-                  />
-                  Delete Post
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Buttons */}
+      <div className="edit-modal-buttons">
+        <button
+          onClick={() => handleUpdatePost(selectedPost)}
+          className="update-button"
+        >
+          <RefreshCcw
+            size={17}
+            color="black"
+            strokeWidth={2}
+            style={{ marginRight: "5px" }}
+          />
+          Update Post
+        </button>
+
+        <button
+          onClick={() => handleDeletePost(selectedPost._id)}
+          className="delete-button"
+        >
+          <Trash2
+            size={17}
+            color="red"
+            strokeWidth={2}
+            style={{ marginRight: "5px" }}
+          />
+          Delete Post
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Edit Profile Modal */}
